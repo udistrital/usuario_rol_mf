@@ -31,12 +31,12 @@
           [formGroup]="formUsuarios"
           class="col-12 col-md-8 col-lg-5"
         >
-          <mat-label class="label">Documento de identidad o correo</mat-label>
+          <mat-label class="label">Documento de identidad, correo o nombre</mat-label>
           <mat-icon matPrefix color="primary">badge</mat-icon>
           <input
             class="input"
             matInput
-            #documentoInput
+            #documentInput
             formControlName="documento"
             required
           />
@@ -45,7 +45,7 @@
             matSuffix
             (click)="
               IniciarPaginacion();
-              BuscarDocumento(documentoInput.value, opcionesPagina[0], 0)
+              BuscarUsuarios(opcionesPagina[0], 0)
             "
           >
             <mat-icon color="primary">search</mat-icon>
@@ -56,6 +56,30 @@
             El campo es obligatorio.
           </mat-error>
         </mat-form-field>
+        <!-- 
+        <mat-form-field
+          class="form"
+          color="primary"
+          appearance="outline"
+          class="col-8 col-md-8 col-lg-5"
+        >
+          <mat-label class="label">Fecha inicial</mat-label>
+          <input
+            class="input"
+            matInput
+            [matDatepicker]="picker"
+            formControlName="fecha_inicio"
+          />
+          <mat-datepicker-toggle matIconSuffix [for]="picker" ></mat-datepicker-toggle>
+          <mat-datepicker color="primary" #picker ></mat-datepicker>
+        </mat-form-field>
+        <button
+          class="col-4 col-md-4 col-lg-2"
+          color="primary"
+          mat-raised-button
+          (click)="BuscarPorFecha()"
+        >Buscar por fecha</button> -->
+
       </div>
 
       <div class="row">
