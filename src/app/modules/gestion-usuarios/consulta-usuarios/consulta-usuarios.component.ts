@@ -265,7 +265,7 @@ export class UsuariosComponent implements OnInit {
 
   BuscarDocumentoPorNombre(nombre: string) {
     const url = `datos_identificacion?fields=Numero&query=Activo:true,TipoDocumentoId.CodigoAbreviacion:CC,` +
-      `TerceroId.NombreCompleto.icontains:${nombre.replace(" ", "|")}`
+      `TerceroId.NombreCompleto.icontains:${nombre.replaceAll(" ", "|")}`
     return this.terceros_service.get(url).pipe(
       map((data: any[]) => {
         if (data.length === 0 || Object.keys(data[0]).length === 0) {
