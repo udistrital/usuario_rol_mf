@@ -28,6 +28,8 @@ export class RegistrarUsuarioComponent {
   identificacion: string = '';
   fechaInicioValue!: Date;
   fechaFinValue!: Date;
+  // fecha mínima para el datepicker de fecha fin (día siguiente a fecha inicio)
+  fechaFinMinima!: Date;
   loading = false;
 
   constructor(
@@ -42,6 +44,17 @@ export class RegistrarUsuarioComponent {
   ngOnInit(): void {
     this.obtenerRoles();
   }
+
+  // al cambiar fecha inicio, recalcula el mínimo de fecha fin y limpia fecha fin
+  onFechaInicioChange() {
+    if (this.fechaInicioValue) {
+      const minFin = new Date(this.fechaInicioValue);
+      minFin.setDate(minFin.getDate() + 1);
+      this.fechaFinMinima = minFin;
+    }
+    this.fechaFinValue = null!;
+  }
+
   obtenerRoles(): void {
     this.loading = true;
     this.historico_service.get('roles/').subscribe({
@@ -80,6 +93,7 @@ export class RegistrarUsuarioComponent {
         'Atención',
         'La fecha final debe ser posterior a la inicial'
       );
+      return;
     }
 
     const fechaInicioFormato = this.formatDate(fechaInicio);
@@ -208,10 +222,28 @@ export class RegistrarUsuarioComponent {
           'success',
           'Creado'
         );
+        this.router.navigate(['gestion-usuarios/consulta-usuarios']);
       },
-      error: () => this.mostrarError('Error al asignar el rol al usuario.'),
-      complete: () =>
-        this.router.navigate(['gestion-usuarios/consulta-usuarios']),
+      error: (err: any) => {
+        const mensajeWso2 =
+          err?.error?.Message || err?.error?.message || err?.message || '';
+        const yaExiste =
+          mensajeWso2.toLowerCase().includes('role') &&
+          (mensajeWso2.toLowerCase().includes('exists') ||
+            mensajeWso2.toLowerCase().includes('already') ||
+            mensajeWso2.toLowerCase().includes('duplicate'));
+
+        if (yaExiste) {
+          this.modalService.mostrarModal(
+            'El usuario ya cuenta con este rol asignado en WSO2. El registro fue guardado en el sistema.',
+            'warning',
+            'Atención'
+          );
+          this.router.navigate(['gestion-usuarios/consulta-usuarios']);
+        } else {
+          this.mostrarError('Error al asignar el rol al usuario.');
+        }
+      },
     });
   }
 
@@ -277,7 +309,6 @@ export class RegistrarUsuarioComponent {
         next: (data: any) => {
           if (data && data.documento) {
             this.identificacion = data.documento;
-
             this.BuscarTercero(this.identificacion);
             this.emailInput.nativeElement.value = data.email;
             this.loading = false;
@@ -319,7 +350,6 @@ export class RegistrarUsuarioComponent {
       next: (data: any) => {
         if (data && data.documento) {
           this.identificacion = data.documento;
-
           this.BuscarTercero(this.identificacion);
           this.documentoInput.nativeElement.value = this.identificacion;
           this.loading = false;
@@ -348,7 +378,6 @@ export class RegistrarUsuarioComponent {
   }
 
   evitarLetraE(event: Event) {
-    //esto ya que el input number permite la letra e
     const input = event.target as HTMLInputElement;
     input.value = input.value.replace(/[^0-9]/g, '');
   }

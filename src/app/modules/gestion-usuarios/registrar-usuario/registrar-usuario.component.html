@@ -58,29 +58,33 @@
             />
           </mat-form-field>
         </div>
+
         <div
           class="d-flex justify-content-center align-items-center fondo-acento-50 mt-4 mb-3"
         >
           <mat-icon> info </mat-icon>
           <p class="mx-2">Información de rol</p>
         </div>
+
         <div class="row">
           <mat-form-field class="col-12 col-md-6 col-lg-4" appearance="outline">
             <mat-label>Rol:</mat-label>
             <mat-icon matSuffix color="primary">account_circle </mat-icon>
             <mat-select #rolInput>
-              <mat-option mat-option *ngFor="let rol of roles" [value]="rol.Id">
+              <mat-option *ngFor="let rol of roles" [value]="rol.Id">
                 {{ rol.Nombre }}
               </mat-option>
             </mat-select>
           </mat-form-field>
 
+          <!-- Fecha Inicio: al cambiar limpia la fecha fin -->
           <mat-form-field class="col-12 col-md-6 col-lg-4" appearance="outline">
             <mat-label>Fecha Inicial Rol:</mat-label>
             <input
               matInput
               [matDatepicker]="picker1"
               [(ngModel)]="fechaInicioValue"
+              (ngModelChange)="onFechaInicioChange()"
             />
             <mat-datepicker-toggle
               color="primary"
@@ -90,17 +94,21 @@
             <mat-datepicker #picker1></mat-datepicker>
           </mat-form-field>
 
+          <!-- Fecha Fin: deshabilitada si no hay fecha inicio, min = fecha inicio + 1 día -->
           <mat-form-field class="col-12 col-md-6 col-lg-4" appearance="outline">
             <mat-label>Fecha Final Rol:</mat-label>
             <input
               matInput
               [matDatepicker]="picker2"
               [(ngModel)]="fechaFinValue"
+              [min]="fechaFinMinima"
+              [disabled]="!fechaInicioValue"
             />
             <mat-datepicker-toggle
               appearance="outline"
               matIconSuffix
               [for]="picker2"
+              [disabled]="!fechaInicioValue"
             ></mat-datepicker-toggle>
             <mat-datepicker #picker2></mat-datepicker>
           </mat-form-field>
@@ -111,6 +119,7 @@
           <p class="mx-2">¿Guardar usuario?</p>
         </div>
       </div>
+
       <mat-dialog-actions align="center">
         <button
           mat-stroked-button

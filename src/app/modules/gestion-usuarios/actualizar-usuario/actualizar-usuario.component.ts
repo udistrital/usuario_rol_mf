@@ -45,6 +45,8 @@ export class ActualizarUsuarioComponent {
   estadoPeriodo: string = '';
   permisoEdicion: boolean = false;
   permisoConsulta: boolean = false;
+  // fecha mínima para el datepicker de fecha fin
+  fechaFinMinima!: Date;
 
   constructor(
     private readonly alertaService: AlertService,
@@ -78,6 +80,16 @@ export class ActualizarUsuarioComponent {
       .catch((error) => {
         console.error('Error al obtener los roles del usuario:', error);
       });
+  }
+
+  // fecha fin mínima = fecha inicio + 1 día (sin restricción del día de hoy)
+  onFechaInicioChange() {
+    if (this.fechaInicioRol) {
+      const minFin = new Date(this.fechaInicioRol);
+      minFin.setDate(minFin.getDate() + 1);
+      this.fechaFinMinima = minFin;
+    }
+    this.fechaFinRol = null;
   }
 
   BuscarTercero(documento: string) {
@@ -168,6 +180,12 @@ export class ActualizarUsuarioComponent {
         this.rolInput.nativeElement.value = data.Data.RolId.Nombre;
         this.email = this.emailInput?.nativeElement?.value || '';
         this.idPeriodo = idPeriodo;
+        // fecha mínima = fecha inicio + 1 día
+        if (this.fechaInicioRol) {
+          const minFin = new Date(this.fechaInicioRol);
+          minFin.setDate(minFin.getDate() + 1);
+          this.fechaFinMinima = minFin;
+        }
         this.loading = false;
       },
       error: (err: any) => {
@@ -188,6 +206,7 @@ export class ActualizarUsuarioComponent {
         'Atención',
         'La fecha final debe ser posterior a la inicial'
       );
+      return;
     }
 
     if (this.estadoPeriodo === 'Finalizado') {
@@ -215,6 +234,7 @@ export class ActualizarUsuarioComponent {
                     'success',
                     'Actualizado'
                   );
+                  this.router.navigate(['gestion-usuarios/consulta-usuarios']);
                 },
                 error: (err: any) => {
                   console.error('Error al actualizar periodo:', err);
@@ -257,6 +277,7 @@ export class ActualizarUsuarioComponent {
               'success',
               'Actualizado'
             );
+            this.router.navigate(['gestion-usuarios/consulta-usuarios']);
           },
           error: (err: any) => {
             console.error('Error al actualizar periodo:', err);
