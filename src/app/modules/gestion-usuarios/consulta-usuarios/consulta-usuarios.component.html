@@ -6,8 +6,29 @@
   </div>
   <mat-card class="p-3">
     <mat-card-content>
-      <div class="d-flex justify-content-between my-2">
+      <div class="d-flex justify-content-between align-items-center my-2">
         <h2 style="color: var(--md-primary-700)">Gestión de Usuarios</h2>
+        <!-- botones de acción -->
+        <div class="d-flex gap-3">
+          <button
+            *ngIf="permisoEdicion"
+            mat-raised-button
+            color="primary"
+            (click)="irARegistro()"
+            style="margin-right: 8px"
+          >
+            <mat-icon>person_add</mat-icon> Registrar Usuario
+          </button>
+          <!-- botón descargar histórico -->
+          <button
+            mat-stroked-button
+            color="primary"
+            style="border: 1px solid var(--md-primary-500)"
+            (click)="descargarHistorico()"
+          >
+            <mat-icon>download</mat-icon> Descargar Histórico
+          </button>
+        </div>
       </div>
 
       <div class="row">
@@ -24,9 +45,8 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="row align-items-center">
         <mat-form-field
-          class="form"
           appearance="outline"
           [formGroup]="formUsuarios"
           class="col-12 col-md-8 col-lg-5"
@@ -55,31 +75,19 @@
           >
             El campo es obligatorio.
           </mat-error>
-        </mat-form-field>
-        <!-- 
-        <mat-form-field
-          class="form"
-          color="primary"
-          appearance="outline"
-          class="col-8 col-md-8 col-lg-5"
-        >
-          <mat-label class="label">Fecha inicial</mat-label>
-          <input
-            class="input"
-            matInput
-            [matDatepicker]="picker"
-            formControlName="fecha_inicio"
-          />
-          <mat-datepicker-toggle matIconSuffix [for]="picker" ></mat-datepicker-toggle>
-          <mat-datepicker color="primary" #picker ></mat-datepicker>
-        </mat-form-field>
-        <button
-          class="col-4 col-md-4 col-lg-2"
-          color="primary"
-          mat-raised-button
-          (click)="BuscarPorFecha()"
-        >Buscar por fecha</button> -->
+-        </mat-form-field>
 
+        <!-- botón para limpiar búsqueda y volver al listado completo -->
+        <div class="col-12 col-md-4 col-lg-3 mb-3" *ngIf="hayBusquedaActiva">
+          <button
+            mat-stroked-button
+            color="primary"
+            style="border: 1px solid var(--md-primary-500)"
+            (click)="LimpiarBusqueda()"
+          >
+            <mat-icon>clear</mat-icon> Ver listado completo
+          </button>
+        </div>
       </div>
 
       <div class="row">
@@ -183,7 +191,6 @@
                 </td>
               </ng-container>
 
-              <!-- Definir las filas y columnas a mostrar -->
               <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
               <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
             </table>

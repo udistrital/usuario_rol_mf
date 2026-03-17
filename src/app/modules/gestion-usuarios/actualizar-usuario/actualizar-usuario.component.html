@@ -55,13 +55,14 @@
             <input type="text" matInput #rolInput disabled />
           </mat-form-field>
 
-          <!-- Fecha Inicial -->
+          <!-- Fecha Inicial: al cambiar limpia la fecha fin -->
           <mat-form-field class="col-12 col-md-6 col-lg-3" appearance="outline">
             <mat-label>Fecha Inicial Rol:</mat-label>
             <input
               matInput
               [matDatepicker]="picker1"
               [(ngModel)]="fechaInicioRol"
+              (ngModelChange)="onFechaInicioChange()"
               disabled
             />
             <mat-datepicker-toggle
@@ -71,17 +72,20 @@
             <mat-datepicker #picker1></mat-datepicker>
           </mat-form-field>
 
-          <!-- Fecha Final -->
+          <!-- Fecha Final: deshabilitada si no hay fecha inicio, min = fecha inicio + 1 día -->
           <mat-form-field class="col-12 col-md-6 col-lg-3" appearance="outline">
             <mat-label>Fecha Final Rol:</mat-label>
             <input
               matInput
               [matDatepicker]="picker2"
               [(ngModel)]="fechaFinRol"
+              [min]="fechaFinMinima"
+              [disabled]="!fechaInicioRol"
             />
             <mat-datepicker-toggle
               matIconSuffix
               [for]="picker2"
+              [disabled]="!fechaInicioRol"
             ></mat-datepicker-toggle>
             <mat-datepicker #picker2></mat-datepicker>
           </mat-form-field>
