@@ -51,12 +51,12 @@
           [formGroup]="formUsuarios"
           class="col-12 col-md-8 col-lg-5"
         >
-          <mat-label class="label">Documento de identidad o correo</mat-label>
+          <mat-label class="label">Documento de identidad, correo o nombre</mat-label>
           <mat-icon matPrefix color="primary">badge</mat-icon>
           <input
             class="input"
             matInput
-            #documentoInput
+            #documentInput
             formControlName="documento"
             required
           />
@@ -65,7 +65,7 @@
             matSuffix
             (click)="
               IniciarPaginacion();
-              BuscarDocumento(documentoInput.value, opcionesPagina[0], 0)
+              BuscarUsuarios(opcionesPagina[0], 0)
             "
           >
             <mat-icon color="primary">search</mat-icon>
@@ -75,7 +75,7 @@
           >
             El campo es obligatorio.
           </mat-error>
-        </mat-form-field>
+-        </mat-form-field>
 
         <!-- botón para limpiar búsqueda y volver al listado completo -->
         <div class="col-12 col-md-4 col-lg-3 mb-3" *ngIf="hayBusquedaActiva">

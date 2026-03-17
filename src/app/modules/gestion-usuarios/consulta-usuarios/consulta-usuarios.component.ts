@@ -10,12 +10,13 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import { HistoricoUsuariosMidService } from 'src/app/services/historico-usuarios-mid.service';
+import { TercerosService } from 'src/app/services/terceros.service';
 import { environment } from 'src/environments/environment';
 import { ModalService } from 'src/app/services/modal.service';
 
 import { Router } from '@angular/router';
 import { ImplicitAuthenticationService } from 'src/app/services/implicit-authentication.service';
-import { catchError, map, of, switchMap } from 'rxjs';
+import { catchError, map, of, forkJoin, switchMap } from 'rxjs';
 import * as moment from 'moment';
 import 'moment/locale/es';
 import * as XLSX from 'xlsx-js-style';
@@ -44,7 +45,7 @@ interface ApiResponse {
   styleUrls: ['./consulta-usuarios.component.scss'],
 })
 export class UsuariosComponent implements OnInit {
-  @ViewChild('documentoInput') documentoInput!: ElementRef;
+  @ViewChild('documentoInput') documentInput!: ElementRef;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   formUsuarios!: FormGroup;
   identificacion: string = '';
@@ -73,6 +74,7 @@ export class UsuariosComponent implements OnInit {
     private readonly fb: FormBuilder,
     private readonly autenticacionService: AutenticacionService,
     private readonly historico_service: HistoricoUsuariosMidService,
+    private readonly terceros_service: TercerosService,
     private readonly router: Router,
     private readonly changeDetector: ChangeDetectorRef,
     private readonly authService: ImplicitAuthenticationService,
@@ -97,6 +99,7 @@ export class UsuariosComponent implements OnInit {
 
     this.formUsuarios = this.fb.group({
       documento: ['', [Validators.required]],
+    //  fecha_inicio: ['', [Validators.required]]
     });
 
     this.sistemaInformacion = environment.SISTEMA_INFORMACION_ID;
@@ -126,9 +129,8 @@ export class UsuariosComponent implements OnInit {
     this.paginator.page.subscribe(() => {
       const limit = this.paginator.pageSize;
       const offset = this.paginator.pageIndex * limit;
-      if (this.hayBusquedaActiva && this.formUsuarios.get('documento')?.value) {
-        this.BuscarDocumento(
-          this.formUsuarios.get('documento')?.value,
+      if (this.formUsuarios.get('documento')?.value) {
+        this.BuscarUsuarios(
           limit,
           offset
         );
@@ -180,7 +182,8 @@ export class UsuariosComponent implements OnInit {
       });
   }
 
-  BuscarDocumento(input: string, limit: number, offset: number) {
+  BuscarUsuarios(limit: number, offset: number) {
+    const input = this.formUsuarios.get("documento")?.value as string
     if (!input) {
       this.modalService.mostrarModal(
         'Por favor, ingresa un dato valido.',
@@ -194,53 +197,65 @@ export class UsuariosComponent implements OnInit {
     this.hayBusquedaActiva = true;
 
     const esEmail = (dato: string): boolean => dato.includes('@');
+    const esDocumento = (dato: string): boolean => /^\d+$/.test(dato);
 
-    const documento$ = esEmail(input)
-      ? this.autenticacionService.getEmail(`token/userRol`, input).pipe(
-          map((data: any) => {
-            if (data?.documento) {
-              return data.documento;
-            } else if (data?.System?.Error === 'Usuario no registrado') {
-              throw new Error('Usuario no encontrado.');
-            } else {
-              throw new Error(data?.Message);
-            }
-          }),
-          catchError((error) => {
-            this.modalService.mostrarModal(
-              'No se pudo procesar la solicitud.',
-              'warning',
-              'error'
-            );
-            return of(null);
-          })
-        )
-      : of(input);
+    const documento$ = esDocumento(input) ? of([input]) : 
+      esEmail(input)
+      ? this.BuscarDocumentoPorCorreo(input)
+      : this.BuscarDocumentoPorNombre(input);
 
+    this.BuscarPorDocumento(documento$, limit, offset);
+  }
+
+  BuscarPorDocumento(documento$: any, limit: number, offset: number) {
     documento$
       .pipe(
-        switchMap((documento: string | null) => {
-          if (!documento) {
-            return of(null);
+        switchMap((documentos: string[]) => {
+          if (!documentos || documentos.length === 0) {
+            return of([]);
           }
-          return this.autenticacionService.getPeriodos(
-            `rol/user/${documento}/periods?query=sistema_informacion:${this.sistemaInformacion}&limit=${limit}&offset=${offset}`
-          );
+          const periods = documentos?.map((documento) => {
+            return this.autenticacionService.getPeriodos(
+              `rol/user/${documento}/periods?query=sistema_informacion:${this.sistemaInformacion}&limit=${limit}&offset=${offset}`
+            ).pipe(
+              catchError((error) => {
+                const noResp: ApiResponse = {
+                  Success: true,
+                  Status: 200,
+                  Message: "No se encontraron periodos para el documento consultado",
+                  Data: [],
+                  Metadata: {Count: 0}
+                };
+                return of(noResp);
+              })
+            );
+          });
+          return forkJoin(periods);
+        }),
+        catchError((error) => {
+          console.error('Error en switchMap:', error);
+          return of([]); // Retorna array vacío silenciosamente
         })
       )
       .subscribe({
-        next: (response: ApiResponse | null) => {
-          if (!response) return;
-          if (response.Success && response.Data.length > 0) {
-            this.dataSource.data = response.Data;
-            this.total = response.Metadata.Count;
-            this.changeDetector.detectChanges();
-          } else {
+        next: (responses: ApiResponse[]) => {
+          if (responses.length === 0) {
             this.modalService.mostrarModal(
-              `No se encontraron periodos para el documento ingresado.`,
+              `No se encontraron periodos para el usuario buscado.`,
               'warning',
               'error'
             );
+          } else {
+            this.total = 0;
+            const newData: UserData[] = [];
+            responses.forEach((response) => {
+              if (response.Success && response.Data.length > 0) {
+                newData.push(...response.Data);
+                this.total += response.Metadata.Count;
+              }
+            });
+            this.dataSource.data = newData;
+            this.changeDetector.detectChanges();
           }
         },
         error: (err: any) => {
@@ -251,6 +266,57 @@ export class UsuariosComponent implements OnInit {
           );
         },
       });
+  }
+
+  BuscarDocumentoPorNombre(nombre: string) {
+    const url = `datos_identificacion?fields=Numero&query=Activo:true,TipoDocumentoId.CodigoAbreviacion:CC,` +
+      `TerceroId.NombreCompleto.icontainsall:${nombre.replaceAll(" ", "|")}`
+    return this.terceros_service.get(url).pipe(
+      map((data: any[]) => {
+        if (data.length === 0 || Object.keys(data[0]).length === 0) {
+          this.modalService.mostrarModal(
+            'No se encontraron datos de la persona buscada.',
+            'warning',
+            'error'
+          );
+          return [];
+        }
+        const docs = data.map((tercero) => tercero?.Numero);
+        const docsUnicos = new Set(docs);
+        const documentos = [...docsUnicos]
+        return documentos
+      }),
+      catchError((error) => {
+        this.modalService.mostrarModal(
+          'No se pudo procesar la solicitud.',
+          'warning',
+          'error'
+        );
+        return [];
+      })
+    );
+  }
+
+  BuscarDocumentoPorCorreo(email: string) {
+    return this.autenticacionService.getEmail(`token/userRol`, email).pipe(
+      map((data: any) => {
+        if (data?.documento) {
+          return [data.documento];
+        } else if (data?.System?.Error === 'Usuario no registrado') {
+          throw new Error('Usuario no encontrado.');
+        } else {
+          throw new Error(data?.Message);
+        }
+      }),
+      catchError((error) => {
+        this.modalService.mostrarModal(
+          'No se pudo procesar la solicitud.',
+          'warning',
+          'error'
+        );
+        return of(null);
+      })
+    )
   }
 
   EliminarPeriodo(id_periodo: number) {
