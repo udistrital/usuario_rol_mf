@@ -2,6 +2,8 @@ export const environment = {
   production: false,
   apiUrl: 'http://localhost:4202/',
   SISTEMA_INFORMACION_ID: 6816,
+  ROLES_CONSULTA: ['JEFE_CONTROL_INTERNO', 'AUDITOR_EXPERTO'],
+  ROLES_CONSULTA_EDICION: ['ADMIN_SISIFO', 'AUDITOR_EXPERTO'],
   AUTENTICACION_MID:
     'https://autenticacion.portaloas.udistrital.edu.co/apioas/autenticacion_mid/v1/',
   HISTORICO_USUARIOS_MID:
