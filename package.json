@@ -8,6 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "build:test": "ng build --progress --configuration=development",
+    "build:prod": "ng build usuario_rol_mf --configuration production",
     "build:single-spa:usuario_rol_mf": "ng build usuario_rol_mf --configuration production",
     "serve:single-spa:usuario_rol_mf": "ng s --project usuario_rol_mf --disable-host-check --port 4202 --live-reload false"
   },
