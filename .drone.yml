@@ -57,25 +57,8 @@ steps:
 #     branch:
 #     - unitest
 
-- name: run_sonar_scanner
-  image: aosapps/drone-sonar-plugin
-  settings:
-    sonar_host:
-      from_secret: SONAR_HOST
-    sonar_token:
-      from_secret: SONAR_TOKEN
-    ver: 1.0
-    exclusions: "**/node_modules/**,**/*.spec.ts,documentation/**"
-  when:
-    branch:
-    - develop
-    - feature/*
-    - release/*
-    event:
-    - push
-
 - name: nodejs_develop
-  image: node:18.20-alpine
+  image: node:20.14-alpine
   commands:
   - node --version
   - npm i
@@ -87,7 +70,7 @@ steps:
     - push     
 
 - name: nodejs_release
-  image: node:18.20-alpine
+  image: node:20.14-alpine
   commands:
   - node --version
   - npm i
@@ -99,7 +82,7 @@ steps:
     - push
    
 - name: nodejs_master
-  image: node:18.20-alpine
+  image: node:20.14-alpine
   commands:
   - node --version
   - npm i
