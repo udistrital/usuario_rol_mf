@@ -1,5 +1,5 @@
 export const environment = {
-    production: false,
+    production: true,
     SISTEMA_INFORMACION_ID: 6816,
     ROLES_CONSULTA: ['JEFE_CONTROL_INTERNO', 'AUDITOR_EXPERTO'],
     ROLES_CONSULTA_EDICION: ['ADMIN_SISIFO', 'AUDITOR_EXPERTO'],

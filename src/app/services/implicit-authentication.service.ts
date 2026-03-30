@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpHeaders, HttpClient } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { environment } from '../../environments/environment.development';
@@ -12,7 +12,9 @@ export class ImplicitAuthenticationService {
   public user$ = this.userSubject.asObservable();
   httpOptions: { headers: HttpHeaders } | undefined;
 
-  constructor(private httpClient: HttpClient) {
+  private httpClient = inject(HttpClient);
+
+  constructor() {
     this.init();
     const user: any = localStorage.getItem('user');
     this.userSubject.next(JSON.parse(atob(user)));
