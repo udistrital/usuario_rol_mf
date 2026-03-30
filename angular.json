@@ -109,16 +109,7 @@
           "builder": "@angular-builders/jest:run",
           "options": {
             "configPath": "jest.config.ts",
-            "tsConfig": "tsconfig.spec.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
-            "styles": [
-              "src/styles.css"
-            ]
+            "tsConfig": "tsconfig.spec.json"
           }
         }
       }
