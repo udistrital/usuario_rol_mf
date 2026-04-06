@@ -5,6 +5,7 @@ import { SpinnerService } from 'src/app/services/spinner.service';
   selector: 'app-spinner',
   templateUrl: './spinner.component.html',
   styleUrl: './spinner.component.css',
+  standalone: false,
 })
 export class SpinnerComponent {
   private readonly spinnerSvc = inject(SpinnerService);

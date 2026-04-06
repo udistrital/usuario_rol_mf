@@ -1,11 +1,14 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { RequestManager } from '../core/managers/requestManager';
 
 @Injectable({
   providedIn: 'root',
 })
 export class TercerosService {
-  constructor(private requestManager: RequestManager) {
+
+  private requestManager = inject(RequestManager);
+
+  constructor() {
     this.requestManager.setPath('TERCEROS_SERVICE');
   }
   get(endpoint: any): any {
