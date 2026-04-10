@@ -1,8 +1,7 @@
 import { NgModule } from '@angular/core';
-import { CommonModule, NgFor } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { HttpClientModule } from '@angular/common/http';
 import { RegistrarUsuarioComponent } from './registrar-usuario/registrar-usuario.component';
 import { GestionUsuariosRoutingModule } from './gestion-usuarios-routing.module';
 
@@ -38,7 +37,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     FormsModule,
     ReactiveFormsModule,
     GestionUsuariosRoutingModule,
-    HttpClientModule,
     MatInputModule,
     MatTableModule,
     MatSelectModule,
@@ -47,7 +45,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatMenuModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    NgFor,
     MatCardModule,
     MatFormFieldModule,
     MatDialogModule,

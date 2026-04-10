@@ -2,6 +2,26 @@ kind: pipeline
 name: oas_cliente_ci
 
 steps:
+- name: run_sonar_scanner
+  image: sonarsource/sonar-scanner-cli:latest
+  environment:
+    SONAR_HOST_URL:
+      from_secret: SONAR_HOST
+    SONAR_TOKEN:
+      from_secret: SONAR_TOKEN
+    SONAR_SCANNER_OPTS: "-Dsonar.working.directory=/tmp/.scannerwork"
+  commands:
+    - sonar-scanner
+  when:
+    branch:
+      - feature/*
+      - develop
+      - release/*
+      - hotfix/*
+      - master
+    event:
+    - push
+
 - name: check_readme
   image: jjvargass/qa_develoment:latest
   commands:
@@ -58,19 +78,20 @@ steps:
 #     - unitest
 
 - name: nodejs_develop
-  image: node:20.14-alpine
+  image: node:24-alpine
   commands:
   - node --version
   - npm i
   - npm run build
   when:
     branch:
+    - feature/*
     - develop
     event:
     - push     
 
 - name: nodejs_release
-  image: node:20.14-alpine
+  image: node:24-alpine
   commands:
   - node --version
   - npm i
@@ -82,7 +103,7 @@ steps:
     - push
    
 - name: nodejs_master
-  image: node:20.14-alpine
+  image: node:24-alpine
   commands:
   - node --version
   - npm i

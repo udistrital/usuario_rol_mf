@@ -1,6 +1,6 @@
 import { enableProdMode, NgZone } from '@angular/core';
 
-import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
+import { platformBrowser } from '@angular/platform-browser';
 import { Router, NavigationStart } from '@angular/router';
 
 import {
@@ -19,7 +19,7 @@ if (environment.production) {
 const lifecycles = singleSpaAngular({
   bootstrapFunction: (singleSpaProps) => {
     singleSpaPropsSubject.next(singleSpaProps);
-    return platformBrowserDynamic(getSingleSpaExtraProviders()).bootstrapModule(
+    return platformBrowser(getSingleSpaExtraProviders()).bootstrapModule(
       AppModule
     );
   },

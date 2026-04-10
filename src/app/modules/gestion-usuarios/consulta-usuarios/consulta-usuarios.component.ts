@@ -2,7 +2,9 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  inject,
   OnInit,
+  signal,
   ViewChild,
 } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
@@ -43,6 +45,7 @@ interface ApiResponse {
   selector: 'app-usuarios',
   templateUrl: './consulta-usuarios.component.html',
   styleUrls: ['./consulta-usuarios.component.scss'],
+  standalone: false,
 })
 export class UsuariosComponent implements OnInit {
   @ViewChild('documentoInput') documentInput!: ElementRef;
@@ -63,31 +66,31 @@ export class UsuariosComponent implements OnInit {
   sistemaInformacion!: number;
   total!: number;
   opcionesPagina: number[] = [10, 15, 20];
-  permisoEdicion: boolean = false;
+  permisoEdicion = signal<boolean>(false);
   permisoConsulta: boolean = false;
   // bandera para saber si hay una búsqueda activa
-  hayBusquedaActiva: boolean = false;
+  hayBusquedaActiva = signal<boolean>(false);
 
   roles: string[] = ['Administrador', 'Usuario Estándar'];
 
-  constructor(
-    private readonly fb: FormBuilder,
-    private readonly autenticacionService: AutenticacionService,
-    private readonly historico_service: HistoricoUsuariosMidService,
-    private readonly terceros_service: TercerosService,
-    private readonly router: Router,
-    private readonly changeDetector: ChangeDetectorRef,
-    private readonly authService: ImplicitAuthenticationService,
-    private readonly modalService: ModalService
-  ) {}
+  private readonly fb = inject(FormBuilder);
+  private readonly autenticacionService = inject(AutenticacionService);
+  private readonly historico_service = inject(HistoricoUsuariosMidService);
+  private readonly terceros_service = inject(TercerosService);
+  private readonly router = inject(Router);
+  private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly authService = inject(ImplicitAuthenticationService);
+  private readonly modalService = inject(ModalService);
+  
+  constructor( ) {}
 
   ngOnInit() {
     this.authService
       .getRole()
       .then((roles) => {
-        this.permisoEdicion = this.authService.PermisoEdicion(roles);
+        this.permisoEdicion.set(this.authService.PermisoEdicion(roles));
         this.permisoConsulta = this.authService.PermisoConsulta(roles);
-        if (!this.permisoEdicion) {
+        if (!this.permisoEdicion()) {
           this.displayedColumns = this.displayedColumns.filter(
             (col) => col !== 'acciones'
           );
@@ -148,7 +151,7 @@ export class UsuariosComponent implements OnInit {
   // limpiar búsqueda y regresar al listado completo
   LimpiarBusqueda() {
     this.formUsuarios.get('documento')?.setValue('');
-    this.hayBusquedaActiva = false;
+    this.hayBusquedaActiva.set(false);
     this.IniciarPaginacion();
     this.PeriodosUsuario(this.sistemaInformacion, this.opcionesPagina[0], 0);
   }
@@ -194,7 +197,7 @@ export class UsuariosComponent implements OnInit {
     }
 
     // marcar búsqueda activa
-    this.hayBusquedaActiva = true;
+    this.hayBusquedaActiva.set(true);
 
     const esEmail = (dato: string): boolean => dato.includes('@');
     const esDocumento = (dato: string): boolean => /^\d+$/.test(dato);

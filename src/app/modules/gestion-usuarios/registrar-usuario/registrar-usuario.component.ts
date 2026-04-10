@@ -1,12 +1,11 @@
-import { AutenticacionService } from './../../../services/autenticacion.service';
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { AutenticacionService } from 'src/app/services/autenticacion.service';
+import { Component, ElementRef, inject, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { HistoricoUsuariosMidService } from 'src/app/services/historico-usuarios-mid.service';
 import { TercerosService } from 'src/app/services/terceros.service';
 import { ModalService } from 'src/app/services/modal.service';
 import { esFechaFinValida } from 'src/app/shared/utils/fecha';
-import { AlertService } from 'src/app/services/alert.service';
 
 export interface RolRegistro {
   Nombre: string;
@@ -18,6 +17,7 @@ export interface RolRegistro {
   selector: 'app-registrar-usuario',
   templateUrl: './registrar-usuario.component.html',
   styleUrls: ['./registrar-usuario.component.scss'],
+  standalone: false,
 })
 export class RegistrarUsuarioComponent {
   @ViewChild('documentoInput') documentoInput!: ElementRef;
@@ -30,16 +30,14 @@ export class RegistrarUsuarioComponent {
   fechaFinValue!: Date;
   // fecha mínima para el datepicker de fecha fin (día siguiente a fecha inicio)
   fechaFinMinima!: Date;
-  loading = false;
 
-  constructor(
-    private readonly alertaService: AlertService,
-    private readonly historico_service: HistoricoUsuariosMidService,
-    private readonly terceros_service: TercerosService,
-    private readonly autenticacionService: AutenticacionService,
-    private readonly modalService: ModalService,
-    private readonly router: Router
-  ) {}
+  private readonly historico_service = inject(HistoricoUsuariosMidService);
+  private readonly terceros_service = inject(TercerosService);
+  private readonly autenticacionService = inject(AutenticacionService);
+  private readonly modalService = inject(ModalService);
+  private readonly router = inject(Router);
+  
+  constructor( ) {}
 
   ngOnInit(): void {
     this.obtenerRoles();
@@ -56,7 +54,6 @@ export class RegistrarUsuarioComponent {
   }
 
   obtenerRoles(): void {
-    this.loading = true;
     this.historico_service.get('roles/').subscribe({
       next: (response: any) => {
         if (response && Array.isArray(response.Data)) {
@@ -67,7 +64,6 @@ export class RegistrarUsuarioComponent {
           );
           this.roles = [];
         }
-        this.loading = false;
       },
       error: (err: any) => {
         console.error('Error al obtener roles:', err);
@@ -76,7 +72,6 @@ export class RegistrarUsuarioComponent {
           'warning',
           'error'
         );
-        this.loading = false;
       },
     });
   }
@@ -89,7 +84,7 @@ export class RegistrarUsuarioComponent {
     email: string
   ) {
     if (!esFechaFinValida(fechaInicio, fechaFin)) {
-      this.alertaService.showAlert(
+      this.modalService.showAlert(
         'Atención',
         'La fecha final debe ser posterior a la inicial'
       );
@@ -128,7 +123,6 @@ export class RegistrarUsuarioComponent {
           }
         },
         error: () => this.mostrarError('Error al verificar el usuario.'),
-        complete: () => (this.loading = false),
       });
   }
 
@@ -253,11 +247,9 @@ export class RegistrarUsuarioComponent {
 
   private mostrarError(mensaje: string) {
     this.modalService.mostrarModal(mensaje, 'warning', 'error');
-    this.loading = false;
   }
 
   BuscarTercero(documento: string) {
-    this.loading = true;
     this.terceros_service
       .get(`tercero/identificacion?query=${documento}`)
       .subscribe({
@@ -269,7 +261,6 @@ export class RegistrarUsuarioComponent {
             data[0].Tercero.NombreCompleto
           ) {
             this.nombreCompleto = data[0].Tercero.NombreCompleto;
-            this.loading = false;
           } else {
             this.modalService.mostrarModal(
               'No se encontraron datos del usuario con el documento proporcionado.',
@@ -284,7 +275,6 @@ export class RegistrarUsuarioComponent {
             'warning',
             'error'
           );
-          this.loading = false;
         },
       });
   }
@@ -302,7 +292,6 @@ export class RegistrarUsuarioComponent {
     this.nombreCompleto = '';
     this.emailInput.nativeElement.value = '';
 
-    this.loading = true;
     this.autenticacionService
       .getDocumento(`token/documentoToken`, documento)
       .subscribe({
@@ -311,14 +300,12 @@ export class RegistrarUsuarioComponent {
             this.identificacion = data.documento;
             this.BuscarTercero(this.identificacion);
             this.emailInput.nativeElement.value = data.email;
-            this.loading = false;
           } else {
             this.modalService.mostrarModal(
               'No se encontraron datos del documento proporcionado.',
               'warning',
               'error'
             );
-            this.loading = false;
           }
         },
         error: (err: any) => {
@@ -327,7 +314,6 @@ export class RegistrarUsuarioComponent {
             'warning',
             'error'
           );
-          this.loading = false;
         },
       });
   }
@@ -345,21 +331,18 @@ export class RegistrarUsuarioComponent {
     this.nombreCompleto = '';
     this.identificacion = '';
 
-    this.loading = true;
     this.autenticacionService.getEmail(`token/userRol`, correo).subscribe({
       next: (data: any) => {
         if (data && data.documento) {
           this.identificacion = data.documento;
           this.BuscarTercero(this.identificacion);
           this.documentoInput.nativeElement.value = this.identificacion;
-          this.loading = false;
         } else {
           this.modalService.mostrarModal(
             'No se encontraron datos asociados al correo proporcionado.',
             'warning',
             'error'
           );
-          this.loading = false;
         }
       },
       error: (err: any) => {
@@ -368,7 +351,6 @@ export class RegistrarUsuarioComponent {
           'warning',
           'error'
         );
-        this.loading = false;
       },
     });
   }
