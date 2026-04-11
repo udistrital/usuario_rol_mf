@@ -1,9 +1,10 @@
-import { AutenticacionService } from './../../../services/autenticacion.service';
+import { AutenticacionService } from 'src/app/services/autenticacion.service';
 import {
   Component,
   ElementRef,
   ViewChild,
   ChangeDetectorRef,
+  inject,
 } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -13,7 +14,6 @@ import { ModalService } from 'src/app/services/modal.service';
 
 import { ImplicitAuthenticationService } from 'src/app/services/implicit-authentication.service';
 import { esFechaFinValida } from 'src/app/shared/utils/fecha';
-import { AlertService } from 'src/app/services/alert.service';
 
 export interface RolRegistro {
   Nombre: string;
@@ -25,9 +25,9 @@ export interface RolRegistro {
   selector: 'app-actualizar-usuario',
   templateUrl: './actualizar-usuario.component.html',
   styleUrls: ['./actualizar-usuario.component.scss'],
+  standalone: false,
 })
 export class ActualizarUsuarioComponent {
-  loading = false;
   @ViewChild('documentoInput') documentoInput!: ElementRef;
   @ViewChild('emailInput') emailInput!: ElementRef;
   @ViewChild('rolInput') rolInput!: ElementRef;
@@ -48,17 +48,16 @@ export class ActualizarUsuarioComponent {
   // fecha mínima para el datepicker de fecha fin
   fechaFinMinima!: Date;
 
-  constructor(
-    private readonly alertaService: AlertService,
-    private readonly historico_service: HistoricoUsuariosMidService,
-    private readonly terceros_service: TercerosService,
-    private readonly autenticacionService: AutenticacionService,
-    private readonly route: ActivatedRoute,
-    private readonly changeDetector: ChangeDetectorRef,
-    private readonly authService: ImplicitAuthenticationService,
-    private readonly modalService: ModalService,
-    private readonly router: Router
-  ) {}
+  private readonly historico_service = inject(HistoricoUsuariosMidService);
+  private readonly terceros_service = inject(TercerosService);
+  private readonly autenticacionService = inject(AutenticacionService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly changeDetector = inject(ChangeDetectorRef);
+  private readonly authService = inject(ImplicitAuthenticationService);
+  private readonly modalService = inject(ModalService);
+  private readonly router = inject(Router);
+  
+  constructor() {}
 
   ngAfterViewInit(): void {
     this.route.queryParams.subscribe((params) => {
@@ -93,7 +92,6 @@ export class ActualizarUsuarioComponent {
   }
 
   BuscarTercero(documento: string) {
-    this.loading = true;
     this.terceros_service
       .get(`tercero/identificacion?query=${documento}`)
       .subscribe({
@@ -113,7 +111,6 @@ export class ActualizarUsuarioComponent {
               'error'
             );
           }
-          this.loading = false;
         },
         error: (err: any) => {
           this.modalService.mostrarModal(
@@ -121,7 +118,6 @@ export class ActualizarUsuarioComponent {
             'warning',
             'error'
           );
-          this.loading = false;
         },
       });
   }
@@ -135,7 +131,6 @@ export class ActualizarUsuarioComponent {
       );
       return;
     }
-    this.loading = true;
     this.idPeriodo = idPeriodo;
 
     this.autenticacionService
@@ -155,7 +150,6 @@ export class ActualizarUsuarioComponent {
               'error'
             );
           }
-          this.loading = false;
         },
         error: (err: any) => {
           this.modalService.mostrarModal(
@@ -163,13 +157,11 @@ export class ActualizarUsuarioComponent {
             'warning',
             'error'
           );
-          this.loading = false;
         },
       });
   }
 
   InfoPeriodo(idPeriodo: number) {
-    this.loading = true;
     this.historico_service.get(`periodos-rol-usuarios/${idPeriodo}`).subscribe({
       next: (data: any) => {
         this.idRol = data.Data.RolId.Id;
@@ -186,7 +178,6 @@ export class ActualizarUsuarioComponent {
           minFin.setDate(minFin.getDate() + 1);
           this.fechaFinMinima = minFin;
         }
-        this.loading = false;
       },
       error: (err: any) => {
         console.error('Error al cargar el periodo:', err);
@@ -195,14 +186,13 @@ export class ActualizarUsuarioComponent {
           'warning',
           'error'
         );
-        this.loading = false;
       },
     });
   }
 
   ActualizarPeriodo() {
     if (!esFechaFinValida(this.fechaInicioRol, this.fechaFinRol)) {
-      this.alertaService.showAlert(
+      this.modalService.showAlert(
         'Atención',
         'La fecha final debe ser posterior a la inicial'
       );
@@ -228,7 +218,6 @@ export class ActualizarUsuarioComponent {
               })
               .subscribe({
                 next: (response: any) => {
-                  this.loading = false;
                   this.modalService.mostrarModal(
                     'Periodo actualizado exitosamente.',
                     'success',
@@ -244,7 +233,6 @@ export class ActualizarUsuarioComponent {
                     'error'
                   );
                 },
-                complete: () => (this.loading = false),
               });
           },
           error: (err: any) => {
@@ -254,7 +242,6 @@ export class ActualizarUsuarioComponent {
               'warning',
               'error'
             );
-            this.loading = false;
           },
         });
     } else {
@@ -287,7 +274,6 @@ export class ActualizarUsuarioComponent {
               'error'
             );
           },
-          complete: () => (this.loading = false),
         });
     }
   }

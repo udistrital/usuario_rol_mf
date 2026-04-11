@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, DoBootstrap, ApplicationRef } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
@@ -9,7 +9,10 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { SpinnerIntercerptor } from './core/intercerptors/spinner.interceptor';
 
 @NgModule({
-  declarations: [AppComponent, SpinnerComponent],
+  declarations: [
+    AppComponent,
+    SpinnerComponent
+  ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
@@ -17,6 +20,9 @@ import { SpinnerIntercerptor } from './core/intercerptors/spinner.interceptor';
     MatIconModule,
   ],
   providers: [provideHttpClient(withInterceptors([SpinnerIntercerptor]))],
-  bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule implements DoBootstrap {
+  ngDoBootstrap(appRef: ApplicationRef) {
+    appRef.bootstrap(AppComponent);
+  }
+}
