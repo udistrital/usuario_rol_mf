@@ -220,18 +220,23 @@ export class RegistrarUsuarioComponent {
       },
       error: (err: any) => {
         const mensajeWso2 =
-          err?.error?.Message || err?.error?.message || err?.message || '';
+          err?.error?.Message ||
+          err?.error?.message ||
+          err?.message || '';
+
         const yaExiste =
-          mensajeWso2.toLowerCase().includes('role') &&
-          (mensajeWso2.toLowerCase().includes('exists') ||
-            mensajeWso2.toLowerCase().includes('already') ||
-            mensajeWso2.toLowerCase().includes('duplicate'));
+          mensajeWso2.toLowerCase().includes('ya está asignado') ||
+          mensajeWso2.toLowerCase().includes('ya esta asignado') ||
+          mensajeWso2.toLowerCase().includes('ya existe en el perfil') ||
+          (mensajeWso2.toLowerCase().includes('role') &&
+            (mensajeWso2.toLowerCase().includes('exists') ||
+              mensajeWso2.toLowerCase().includes('already')));
 
         if (yaExiste) {
           this.modalService.mostrarModal(
-            'El usuario ya cuenta con este rol asignado en WSO2. El registro fue guardado en el sistema.',
-            'warning',
-            'Atención'
+            'Rol asignado exitosamente.',
+            'success',   
+            'Creado'     
           );
           this.router.navigate(['gestion-usuarios/consulta-usuarios']);
         } else {
