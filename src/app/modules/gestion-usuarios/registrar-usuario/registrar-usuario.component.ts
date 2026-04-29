@@ -28,7 +28,6 @@ export class RegistrarUsuarioComponent {
   identificacion: string = '';
   fechaInicioValue!: Date;
   fechaFinValue!: Date;
-  // fecha mínima para el datepicker de fecha fin (día siguiente a fecha inicio)
   fechaFinMinima!: Date;
 
   private readonly historico_service = inject(HistoricoUsuariosMidService);
@@ -37,13 +36,12 @@ export class RegistrarUsuarioComponent {
   private readonly modalService = inject(ModalService);
   private readonly router = inject(Router);
   
-  constructor( ) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.obtenerRoles();
   }
 
-  // al cambiar fecha inicio, recalcula el mínimo de fecha fin y limpia fecha fin
   onFechaInicioChange() {
     if (this.fechaInicioValue) {
       const minFin = new Date(this.fechaInicioValue);
@@ -139,8 +137,11 @@ export class RegistrarUsuarioComponent {
       next: (response: any) => {
         const periodos = response?.Data || [];
 
+        // Se agrega validación de Activo para excluir periodos eliminados con soft delete
         const periodoVigente = periodos.find((p: any) => {
-          return p.RolId.Id === Number(rolId) && p.Finalizado === false;
+          return p.RolId.Id === Number(rolId) && 
+                 p.Finalizado === false &&
+                 p.Activo === true;
         });
 
         if (periodoVigente) {
@@ -224,6 +225,8 @@ export class RegistrarUsuarioComponent {
           err?.error?.message ||
           err?.message || '';
 
+        // Se valida el mensaje de error de WSO2 para identificar si el rol
+        // ya existe y evitar mostrar error al usuario en ese caso puntual
         const yaExiste =
           mensajeWso2.toLowerCase().includes('ya está asignado') ||
           mensajeWso2.toLowerCase().includes('ya esta asignado') ||
@@ -235,8 +238,8 @@ export class RegistrarUsuarioComponent {
         if (yaExiste) {
           this.modalService.mostrarModal(
             'Rol asignado exitosamente.',
-            'success',   
-            'Creado'     
+            'success',
+            'Creado'
           );
           this.router.navigate(['gestion-usuarios/consulta-usuarios']);
         } else {
