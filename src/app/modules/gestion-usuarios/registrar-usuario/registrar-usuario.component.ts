@@ -28,7 +28,6 @@ export class RegistrarUsuarioComponent {
   identificacion: string = '';
   fechaInicioValue!: Date;
   fechaFinValue!: Date;
-  // fecha mínima para el datepicker de fecha fin (día siguiente a fecha inicio)
   fechaFinMinima!: Date;
 
   private readonly historico_service = inject(HistoricoUsuariosMidService);
@@ -37,13 +36,12 @@ export class RegistrarUsuarioComponent {
   private readonly modalService = inject(ModalService);
   private readonly router = inject(Router);
   
-  constructor( ) {}
+  constructor() {}
 
   ngOnInit(): void {
     this.obtenerRoles();
   }
 
-  // al cambiar fecha inicio, recalcula el mínimo de fecha fin y limpia fecha fin
   onFechaInicioChange() {
     if (this.fechaInicioValue) {
       const minFin = new Date(this.fechaInicioValue);
@@ -139,8 +137,11 @@ export class RegistrarUsuarioComponent {
       next: (response: any) => {
         const periodos = response?.Data || [];
 
+        // Se agrega validación de Activo para excluir periodos eliminados con soft delete
         const periodoVigente = periodos.find((p: any) => {
-          return p.RolId.Id === Number(rolId) && p.Finalizado === false;
+          return p.RolId.Id === Number(rolId) && 
+                 p.Finalizado === false &&
+                 p.Activo === true;
         });
 
         if (periodoVigente) {
@@ -220,18 +221,25 @@ export class RegistrarUsuarioComponent {
       },
       error: (err: any) => {
         const mensajeWso2 =
-          err?.error?.Message || err?.error?.message || err?.message || '';
+          err?.error?.Message ||
+          err?.error?.message ||
+          err?.message || '';
+
+        // Se valida el mensaje de error de WSO2 para identificar si el rol
+        // ya existe y evitar mostrar error al usuario en ese caso puntual
         const yaExiste =
-          mensajeWso2.toLowerCase().includes('role') &&
-          (mensajeWso2.toLowerCase().includes('exists') ||
-            mensajeWso2.toLowerCase().includes('already') ||
-            mensajeWso2.toLowerCase().includes('duplicate'));
+          mensajeWso2.toLowerCase().includes('ya está asignado') ||
+          mensajeWso2.toLowerCase().includes('ya esta asignado') ||
+          mensajeWso2.toLowerCase().includes('ya existe en el perfil') ||
+          (mensajeWso2.toLowerCase().includes('role') &&
+            (mensajeWso2.toLowerCase().includes('exists') ||
+              mensajeWso2.toLowerCase().includes('already')));
 
         if (yaExiste) {
           this.modalService.mostrarModal(
-            'El usuario ya cuenta con este rol asignado en WSO2. El registro fue guardado en el sistema.',
-            'warning',
-            'Atención'
+            'Rol asignado exitosamente.',
+            'success',
+            'Creado'
           );
           this.router.navigate(['gestion-usuarios/consulta-usuarios']);
         } else {
