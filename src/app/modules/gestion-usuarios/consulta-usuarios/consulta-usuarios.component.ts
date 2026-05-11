@@ -18,7 +18,7 @@ import { ModalService } from 'src/app/services/modal.service';
 
 import { Router } from '@angular/router';
 import { ImplicitAuthenticationService } from 'src/app/services/implicit-authentication.service';
-import { catchError, map, of, forkJoin, switchMap } from 'rxjs';
+import { catchError, map, of, forkJoin, switchMap, Observable } from 'rxjs';
 import * as moment from 'moment';
 import 'moment/locale/es';
 import * as XLSX from 'xlsx-js-style';
@@ -202,10 +202,14 @@ export class UsuariosComponent implements OnInit {
     const esEmail = (dato: string): boolean => dato.includes('@');
     const esDocumento = (dato: string): boolean => /^\d+$/.test(dato);
 
-    const documento$ = esDocumento(input) ? of([input]) : 
-      esEmail(input)
-      ? this.BuscarDocumentoPorCorreo(input)
-      : this.BuscarDocumentoPorNombre(input);
+    let documento$: any;
+    if (esDocumento(input)) {
+      documento$ = of([input]);
+    } else if (esEmail(input)) {
+      documento$ = this.BuscarDocumentoPorCorreo(input);
+    } else {
+      documento$ = this.BuscarDocumentoPorNombre(input);
+    }
 
     this.BuscarPorDocumento(documento$, limit, offset);
   }
@@ -217,7 +221,7 @@ export class UsuariosComponent implements OnInit {
           if (!documentos || documentos.length === 0) {
             return of([]);
           }
-          const periods = documentos?.map((documento) => {
+          const periods: Observable<ApiResponse>[] = documentos.map((documento) => {
             return this.autenticacionService.getPeriodos(
               `rol/user/${documento}/periods?query=sistema_informacion:${this.sistemaInformacion}&limit=${limit}&offset=${offset}`
             ).pipe(

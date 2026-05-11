@@ -99,8 +99,7 @@ export class ActualizarUsuarioComponent {
           if (
             data &&
             data.length > 0 &&
-            data[0].Tercero &&
-            data[0].Tercero.NombreCompleto
+            data[0]?.Tercero?.NombreCompleto
           ) {
             this.nombreCompleto = data[0].Tercero.NombreCompleto;
             this.changeDetector.detectChanges();
@@ -137,7 +136,7 @@ export class ActualizarUsuarioComponent {
       .getDocumento(`token/documentoToken`, documento)
       .subscribe({
         next: (data: any) => {
-          if (data && data.documento) {
+          if (data?.documento) {
             this.identificacion = data.documento;
             this.emailInput.nativeElement.value = data.email;
             this.BuscarTercero(this.identificacion);

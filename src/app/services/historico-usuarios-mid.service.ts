@@ -4,7 +4,7 @@ import { RequestManager } from '../core/managers/requestManager';
 @Injectable()
 export class HistoricoUsuariosMidService {
 
-  private requestManager = inject(RequestManager);
+  private readonly requestManager = inject(RequestManager);
 
   constructor() {
     this.requestManager.setPath('HISTORICO_USUARIOS_MID');
