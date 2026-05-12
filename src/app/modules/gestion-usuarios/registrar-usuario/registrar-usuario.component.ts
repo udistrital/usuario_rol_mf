@@ -52,7 +52,7 @@ export class RegistrarUsuarioComponent {
   }
 
   obtenerRoles(): void {
-    this.historico_service.get('roles/').subscribe({
+    this.historico_service.get('roles').subscribe({
       next: (response: any) => {
         if (response && Array.isArray(response.Data)) {
           this.roles = response.Data;
