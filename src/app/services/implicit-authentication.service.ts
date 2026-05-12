@@ -8,11 +8,11 @@ import { environment } from '../../environments/environment.development';
 export class ImplicitAuthenticationService {
   rolesConsulta = environment.ROLES_CONSULTA;
   rolesEdicion = environment.ROLES_CONSULTA_EDICION;
-  private userSubject = new BehaviorSubject({});
+  private readonly userSubject = new BehaviorSubject({});
   public user$ = this.userSubject.asObservable();
   httpOptions: { headers: HttpHeaders } | undefined;
 
-  private httpClient = inject(HttpClient);
+  private readonly httpClient = inject(HttpClient);
 
   constructor() {
     this.init();
@@ -21,7 +21,7 @@ export class ImplicitAuthenticationService {
   }
 
   init(): any {
-    const id_token = window.localStorage.getItem('id_token');
+    const id_token = localStorage.getItem('id_token');
 
     if (id_token) {
       const id_token_array = id_token.split('.');
@@ -49,12 +49,12 @@ export class ImplicitAuthenticationService {
     return new Promise<string[]>((resolve) => {
       this.user$.subscribe((data: any) => {
         const { user, userService } = data;
-        const roleUser = typeof user.role !== 'undefined' ? user.role : [];
+        const roleUser = user.role === undefined ? [] : user.role;
         const roleUserService =
-          typeof userService.role !== 'undefined' ? userService.role : [];
+          userService.role === undefined ? [] : userService.role;
         const roles = roleUser
           .concat(roleUserService)
-          .filter((data: any) => data.indexOf('/') === -1);
+          .filter((data: any) => !data.includes('/'));
         resolve(roles);
       });
     });
