@@ -18,8 +18,8 @@ import { environment } from '../../../environments/environment';
 export class RequestManager {
   private path!: any;
   public httpOptions: any;
-  constructor(private http: HttpClient, private errManager: HttpErrorManager) {
-    const acces_token = window.localStorage.getItem('access_token');
+  constructor(private readonly http: HttpClient, private readonly errManager: HttpErrorManager) {
+    const acces_token = localStorage.getItem('access_token');
     if (acces_token !== null) {
       this.httpOptions = {
         headers: new HttpHeaders({
@@ -46,13 +46,6 @@ export class RequestManager {
    */
   get(endpoint: string) {
     return this.http.get<any>(`${this.path}${endpoint}`, this.httpOptions).pipe(
-      map((res) => {
-        if (res.hasOwnProperty('Body')) {
-          return res;
-        } else {
-          return res;
-        }
-      }),
       catchError(this.errManager.handleError.bind(this))
     );
   }

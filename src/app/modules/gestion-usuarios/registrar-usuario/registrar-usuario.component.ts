@@ -52,7 +52,7 @@ export class RegistrarUsuarioComponent {
   }
 
   obtenerRoles(): void {
-    this.historico_service.get('roles/').subscribe({
+    this.historico_service.get('roles').subscribe({
       next: (response: any) => {
         if (response && Array.isArray(response.Data)) {
           this.roles = response.Data;
@@ -92,7 +92,7 @@ export class RegistrarUsuarioComponent {
     const fechaInicioFormato = this.formatDate(fechaInicio);
     const fechaFinFormato = this.formatDate(fechaFin);
     const usuario = { Documento: documento };
-    const nombreRol = this.roles.find((r) => r.Id === rolId)?.NombreWso2 || '';
+    const nombreRol = this.roles.find((r) => r.Id === rolId)?.NombreWso2 ?? '';
 
     this.historico_service
       .get(`usuarios?query=documento:${documento}`)
@@ -262,12 +262,7 @@ export class RegistrarUsuarioComponent {
       .get(`tercero/identificacion?query=${documento}`)
       .subscribe({
         next: (data: any) => {
-          if (
-            data &&
-            data.length > 0 &&
-            data[0].Tercero &&
-            data[0].Tercero.NombreCompleto
-          ) {
+          if (data?.length > 0 && data[0].Tercero?.NombreCompleto) {
             this.nombreCompleto = data[0].Tercero.NombreCompleto;
           } else {
             this.modalService.mostrarModal(
@@ -304,7 +299,7 @@ export class RegistrarUsuarioComponent {
       .getDocumento(`token/documentoToken`, documento)
       .subscribe({
         next: (data: any) => {
-          if (data && data.documento) {
+          if (data?.documento) {
             this.identificacion = data.documento;
             this.BuscarTercero(this.identificacion);
             this.emailInput.nativeElement.value = data.email;
@@ -341,7 +336,7 @@ export class RegistrarUsuarioComponent {
 
     this.autenticacionService.getEmail(`token/userRol`, correo).subscribe({
       next: (data: any) => {
-        if (data && data.documento) {
+        if (data?.documento) {
           this.identificacion = data.documento;
           this.BuscarTercero(this.identificacion);
           this.documentoInput.nativeElement.value = this.identificacion;
@@ -369,6 +364,6 @@ export class RegistrarUsuarioComponent {
 
   evitarLetraE(event: Event) {
     const input = event.target as HTMLInputElement;
-    input.value = input.value.replace(/[^0-9]/g, '');
+    input.value = input.value.replace(/\D/g, '');
   }
 }

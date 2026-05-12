@@ -6,7 +6,7 @@ import { RequestManager } from '../core/managers/requestManager';
 })
 export class TercerosService {
 
-  private requestManager = inject(RequestManager);
+  private readonly requestManager = inject(RequestManager);
 
   constructor() {
     this.requestManager.setPath('TERCEROS_SERVICE');

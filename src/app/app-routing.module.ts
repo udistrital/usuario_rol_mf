@@ -1,4 +1,3 @@
-import { GestionUsuariosModule } from './modules/gestion-usuarios/gestion-usuarios.module';
 import { APP_BASE_HREF } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { provideHttpClient, withFetch } from '@angular/common/http';
