@@ -35,6 +35,11 @@
     background-color: #f9eaf1;
     color: var(--md-warning-500);
   }
+
+  &.deleted {
+    background-color: #ef9a9a;
+    color: #b71c1c;
+  }
 }
 
 .link {
