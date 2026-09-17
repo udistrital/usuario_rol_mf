@@ -76,7 +76,7 @@
               "optimization": false,
               "vendorChunk": true,
               "extractLicenses": false,
-              "sourceMap": true,
+              "sourceMap": false,
               "namedChunks": true,
               "outputHashing": "none",
               "deployUrl": "http://localhost:4202/"
@@ -105,7 +105,7 @@
           "defaultConfiguration": "local"
         },
         "extract-i18n": {
-          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "builder": "@angular/build:extract-i18n",
           "options": {
             "buildTarget": "usuario_rol_mf:build"
           }

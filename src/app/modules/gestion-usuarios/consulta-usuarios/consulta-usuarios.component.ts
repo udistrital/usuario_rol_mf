@@ -6,6 +6,7 @@ import {
   OnInit,
   signal,
   ViewChild,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -20,7 +21,7 @@ import { Router } from '@angular/router';
 import { ImplicitAuthenticationService } from 'src/app/services/implicit-authentication.service';
 import { catchError, map, of, forkJoin, switchMap, Observable } from 'rxjs';
 import moment from 'moment';
-import 'moment/locale/es';
+import 'moment/moment.js';
 import * as XLSX from 'xlsx-js-style';
 
 interface UserData {
@@ -45,6 +46,7 @@ interface ApiResponse {
   selector: 'app-usuarios',
   templateUrl: './consulta-usuarios.component.html',
   styleUrls: ['./consulta-usuarios.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false,
 })
 export class UsuariosComponent implements OnInit {
