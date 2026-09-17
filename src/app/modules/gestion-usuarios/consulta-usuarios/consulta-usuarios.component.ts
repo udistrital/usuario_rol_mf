@@ -19,7 +19,7 @@ import { ModalService } from 'src/app/services/modal.service';
 import { Router } from '@angular/router';
 import { ImplicitAuthenticationService } from 'src/app/services/implicit-authentication.service';
 import { catchError, map, of, forkJoin, switchMap, Observable } from 'rxjs';
-import * as moment from 'moment';
+import moment from 'moment';
 import 'moment/locale/es';
 import * as XLSX from 'xlsx-js-style';
 
