@@ -1,0 +1,33 @@
+allowBuilds:
+  '@parcel/watcher': true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
+  unrs-resolver: true
+
+overrides:
+  "shell-quote": ">=1.9.0"
+  "websocket-driver": ">=0.7.5"
+  "immutable": ">=5.1.8"
+  "form-data": ">=4.0.6"
+  "vite": ">=7.3.5"
+  "piscina": ">=5.2.0"
+  "ip-address": ">=10.3.1"
+  "brace-expansion": ">=5.0.7"
+  "js-yaml": ">=4.3.2"
+  "browserslist": ">=4.28.7"
+  "fast-uri": ">=3.1.6"
+  "postcss": ">=8.5.23"
+  "http-proxy-middleware": ">=3.0.7"
+  "sigstore": ">=4.1.1"
+  "hono": ">=4.13.5"
+  "@hono/node-server": ">=1.19.15"
+  "tar": ">=7.5.18"
+  "baseline-browser-mapping": ">=2.11.0"
+  "@sigstore/verify": ">=3.1.1"
+  "qs": ">=6.15.2"
+  "uuid": ">=11.1.1"
+  "undici": ">=6.28.0"
+  "@babel/core": ">=7.29.6 <8.0.0"
+  "esbuild": ">=0.28.1"
+  "postcss-selector-parser": ">=7.1.3"

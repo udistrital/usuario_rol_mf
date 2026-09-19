@@ -1,5 +1,5 @@
 import { AutenticacionService } from 'src/app/services/autenticacion.service';
-import { Component, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { HistoricoUsuariosMidService } from 'src/app/services/historico-usuarios-mid.service';
@@ -17,6 +17,7 @@ export interface RolRegistro {
   selector: 'app-registrar-usuario',
   templateUrl: './registrar-usuario.component.html',
   styleUrls: ['./registrar-usuario.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false,
 })
 export class RegistrarUsuarioComponent {

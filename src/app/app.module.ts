@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { MatIconModule } from '@angular/material/icon';
 import { SpinnerComponent } from './shared/components/spinner/spinner.component';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { SpinnerIntercerptor } from './core/intercerptors/spinner.interceptor';
 
 @NgModule({
@@ -19,7 +19,7 @@ import { SpinnerIntercerptor } from './core/intercerptors/spinner.interceptor';
     AppRoutingModule,
     MatIconModule,
   ],
-  providers: [provideHttpClient(withInterceptors([SpinnerIntercerptor]))],
+  providers: [provideHttpClient(withXhr(), withInterceptors([SpinnerIntercerptor]))],
 })
 export class AppModule implements DoBootstrap {
   ngDoBootstrap(appRef: ApplicationRef) {
