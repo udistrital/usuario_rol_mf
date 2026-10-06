@@ -5,6 +5,7 @@ import {
   ViewChild,
   ChangeDetectorRef,
   inject,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
@@ -25,6 +26,7 @@ export interface RolRegistro {
   selector: 'app-actualizar-usuario',
   templateUrl: './actualizar-usuario.component.html',
   styleUrls: ['./actualizar-usuario.component.scss'],
+  changeDetection: ChangeDetectionStrategy.Eager,
   standalone: false,
 })
 export class ActualizarUsuarioComponent {
