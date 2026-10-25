@@ -1,4 +1,4 @@
-# Usuario Rol Microcliente
+# usuario_rol_mf
 
 Microcliente para la gestión de los periodos de roles de un usuario, este sistema complementa su funcionalidad con WSO2. Este microcliente es de uso transversal para los sistemas que requieran gestionar los roles de los usuarios.
 
@@ -6,8 +6,8 @@ Microcliente para la gestión de los periodos de roles de un usuario, este siste
 
 ### Requisitos
 
-- Node.js **24.22.1**, versión utilizada en Drone mediante `node:24.22.1-alpine`.
-- pnpm **11.25.0**, versión utilizada para validar la instalación y la compilación.
+- [Node.js](https://nodejs.org/) **24.22.1**, versión utilizada en Drone mediante `node:24.22.1-alpine`.
+- [pnpm](https://pnpm.io/) **11.25.0**, versión utilizada para validar la instalación y la compilación.
 
 ```bash
 npm install -g pnpm@11.25.0
@@ -21,49 +21,45 @@ Versiones resueltas en el lockfile:
 
 | Tecnología | Versión |
 | -- | -- |
-| Angular | 22.2.1 |
-| Angular CLI y herramientas de compilación | 22.1.8 |
-| Angular Material y CDK | 22.1.7 |
-| TypeScript | 6.0.3 |
-| RxJS | 7.8.2 |
-| Single-spa | 6.0.3 |
-| single-spa-angular | 9.2.0 |
-| SweetAlert2 | 11.26.25 |
-| @sweetalert2/ngx-sweetalert2 | 15.0.0 |
-| tslib | 2.8.1 |
-| Zone.js | 0.15.1 |
+| [Angular](https://angular.dev/) | 22.2.1 |
+| [Angular CLI y herramientas de compilación](https://angular.dev/tools/cli) | 22.1.8 |
+| [Angular Material y CDK](https://material.angular.dev/) | 22.1.7 |
+| [TypeScript](https://www.typescriptlang.org/) | 6.0.3 |
+| [RxJS](https://rxjs.dev/) | 7.8.2 |
+| [Single-spa](https://single-spa.js.org/) | 6.0.3 |
+| [single-spa-angular](https://single-spa.js.org/docs/ecosystem-angular/) | 9.2.0 |
+| [SweetAlert2](https://sweetalert2.github.io/) | 11.26.25 |
+| [@sweetalert2/ngx-sweetalert2](https://github.com/sweetalert2/ngx-sweetalert2) | 15.0.0 |
+| [tslib](https://github.com/microsoft/tslib) | 2.8.1 |
+| [Zone.js](https://github.com/angular/angular/tree/main/packages/zone.js) | 0.15.1 |
 
 La compilación y el servidor local utilizan `@angular-builders/custom-webpack`. Vite forma parte de las dependencias transitivas de las herramientas de Angular.
 
 ### Variables de Entorno
 
-```javascript
-export const environment = {
-  production: false,
-  apiUrl: "http://localhost:4202/",
-  AUTENTICACION_MID: [URL de API MID Autenticación],
-  TOKEN: {
-    AUTORIZATION_URL: [URL de Autorización - login],
-    CLIENTE_ID: [Token de acceso],
-    RESPONSE_TYPE: [Tipo de Respuesta del token],
-    SCOPE: [Alcance de la solicitud],
-    REDIRECT_URL: [URL de redirección],
-    SIGN_OUT_URL: [URL de Cerrar Sesión - logout],
-    SIGN_OUT_REDIRECT_URL: [URL de redirección despues de cerrar sesion],
-    AUTENTICACION_MID:  [URL de API MID Autenticación],
-  },
-};
-```
+La configuración se define en los archivos TypeScript de [src/environments](src/environments): `environment.ts` para ejecución local, `environment.development.ts` para pruebas y `environment.production.ts` para producción. Los reemplazos de compilación están definidos en [angular.json](angular.json).
 
-## Ejecución del Proyecto
+| Variable | Descripción |
+| -- | -- |
+| `production` | Indica si la configuración corresponde a producción. |
+| `apiUrl` | URL local del microcliente; definida en `environment.ts` como `http://localhost:4202/`. |
+| `SISTEMA_INFORMACION_ID` | Identificador del sistema de información para consultar usuarios y roles. |
+| `ROLES_CONSULTA` | Roles autorizados para consultar usuarios. |
+| `ROLES_CONSULTA_EDICION` | Roles autorizados para editar usuarios. |
+| `AUTENTICACION_MID` | URL base del servicio de autenticación. |
+| `HISTORICO_USUARIOS_MID` | URL base del servicio de usuarios y roles. |
+| `TERCEROS_SERVICE` | URL base del servicio de terceros. |
+| `AUTENTICACION` | URL base de autenticación utilizada por la configuración del cliente. |
+
+### Ejecución del Proyecto
 
 Este proyecto es parte de una infraestructura de microfrontend implementada con la librería Single-SPA. Para ejecutarlo correctamente, es necesario levantar dos aplicaciones independientes: el **Root** y el **Core**.
 
-### Root
+#### Root
 
 El Root contiene la lógica de Sísifo
 
-### Pasos para la Ejecución del Root
+##### Pasos para la Ejecución del Root
 
 1. Clonar el repositorio del Root:
 
@@ -88,11 +84,11 @@ El Root contiene la lógica de Sísifo
    npm start
    ```
 
-### Core
+#### Core
 
 El Core contiene componentes generales que construyen el layout y administran aspectos como la autenticación.
 
-### Pasos para la Ejecución del Core
+##### Pasos para la Ejecución del Core
 
 1. Clonar el repositorio del Core:
 
@@ -118,11 +114,11 @@ El Core contiene componentes generales que construyen el layout y administran as
    npm start
    ```
 
-### usuario_rol_mf
+#### usuario_rol_mf
 
 Microcliente de gestión de usuarios
 
-### Pasos para la Ejecución de usuario_rol_mf
+##### Pasos para la Ejecución de usuario_rol_mf
 
 1. Clonar el repositorio:
 
@@ -150,7 +146,7 @@ Microcliente de gestión de usuarios
 
 Con estos pasos, se tendrán las partes mínimas necesarias para ejecutar el proyecto en un entorno local.
 
-## Compilación
+#### Compilación
 
 | Comando | Configuración | Uso en Drone |
 | -- | -- | -- |
@@ -160,50 +156,17 @@ Con estos pasos, se tendrán las partes mínimas necesarias para ejecutar el pro
 
 Los archivos generados se guardan en `dist/`. Drone publica los artefactos de `release/*` y `master` en los destinos S3 configurados en [.drone.yml](.drone.yml).
 
-## Docker
-
-No se documenta una ejecución independiente mediante Dockerfile o Docker Compose. La compilación en Drone utiliza `node:24.22.1-alpine` en sus tres pasos de Node.
-
-## Pruebas
+### Ejecución Pruebas
 
 ```bash
 pnpm test
 ```
 
-Las pruebas usan Jest y la configuración de [jest.config.ts](jest.config.ts). En la validación del 25 de octubre de 2026, su ejecución quedó bloqueada porque `jest-environment-jsdom` no está declarado en las dependencias. La compilación local sí se verificó con Node 24.22.1 y una instalación con el lockfile congelado; esto no equivale a una ejecución satisfactoria de las pruebas.
-
-## Mantenimiento de dependencias y seguridad
-
-Los overrides de [pnpm-workspace.yaml](pnpm-workspace.yaml) establecen versiones mínimas corregidas para las dependencias transitivas. El lockfile conserva las versiones exactas instaladas.
-
-| Dependencia | Mínimo establecido | Versión resuelta |
-| -- | -- | -- |
-| Vite | 8.3.3 | 8.3.5 |
-| launch-editor | 2.14.2 | 2.14.2 |
-| Hono | 4.13.11 | 4.13.13 |
-| Zod | 4.6.6 | 4.6.7 |
-| Undici | 8.12.2 | 8.12.3 |
-| fast-uri | 4.2.3 | 4.2.3 |
-| serialize-javascript | 7.1.3 | 7.1.4 |
-
-Para revisar los avisos vigentes:
-
-```bash
-pnpm audit
-```
-
-La auditoría del **25 de octubre de 2026**, posterior a estas actualizaciones, no reportó avisos para las siete dependencias de la tabla. Permanecieron **3 avisos**: dos de severidad alta asociados a `body-parser` y uno moderado asociado a `ip-address`. Este resultado corresponde a esa revisión y debe comprobarse nuevamente al actualizar dependencias.
-
-Al modificar los overrides, regenere y versione también el lockfile:
-
-```bash
-pnpm install --lockfile-only
-pnpm install --frozen-lockfile
-pnpm audit
-pnpm run build
-```
+Las pruebas usan [Jest](https://jestjs.io/) y la configuración de [jest.config.ts](jest.config.ts). Actualmente, su ejecución requiere resolver la dependencia faltante `jest-environment-jsdom`, utilizada por el entorno `jsdom` configurado.
 
 ## Estado CI
+
+El pipeline de [Drone](.drone.yml) ejecuta el análisis Sonar y las compilaciones según la rama. Los tres pasos de Node utilizan `node:24.22.1-alpine`.
 
 | Develop | Release | Master |
 | -- | -- | -- |
@@ -211,10 +174,10 @@ pnpm run build
 
 ## Licencia
 
-[This file is part of usuario_rol_mf](LICENSE)
+This file is part of usuario_rol_mf.
 
 usuario_rol_mf is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
 usuario_rol_mf is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with usuario_rol_mf. If not, see https://www.gnu.org/licenses/.
+You should have received a copy of the GNU General Public License along with usuario_rol_mf. If not, see [GNU Licenses](https://www.gnu.org/licenses/).
