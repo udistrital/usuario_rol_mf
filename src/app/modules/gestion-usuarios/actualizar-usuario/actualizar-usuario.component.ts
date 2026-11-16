@@ -15,6 +15,9 @@ import { ModalService } from 'src/app/services/modal.service';
 
 import { ImplicitAuthenticationService } from 'src/app/services/implicit-authentication.service';
 import { esFechaFinValida } from 'src/app/shared/utils/fecha';
+import { ParametrosService } from 'src/app/services/parametros.service';
+import { environment } from 'src/environments/environment';
+import { PermisoConsulta, PermisoEdicion, sistemaPorRol } from 'src/app/shared/utils/sistemaPorRol';
 
 export interface RolRegistro {
   Nombre: string;
@@ -58,6 +61,7 @@ export class ActualizarUsuarioComponent {
   private readonly authService = inject(ImplicitAuthenticationService);
   private readonly modalService = inject(ModalService);
   private readonly router = inject(Router);
+  private readonly parametrosService = inject(ParametrosService);
   
   constructor() {}
 
@@ -74,9 +78,11 @@ export class ActualizarUsuarioComponent {
 
     this.authService
       .getRole()
-      .then((roles) => {
-        this.permisoEdicion = this.authService.PermisoEdicion(roles);
-        this.permisoConsulta = this.authService.PermisoConsulta(roles);
+      .then(async (roles) => {
+        const sistemas = await this.parametrosService.get(`parametro?query=TipoParametroId.Id:${environment.TIPO_PARAMETRO_SISTEMA_ID}`);
+        const sistemaId = sistemaPorRol(roles, sistemas);
+        this.permisoEdicion = PermisoEdicion(roles, sistemaId, sistemas);
+        this.permisoConsulta = PermisoConsulta(roles, sistemaId, sistemas);
       })
       .catch((error) => {
         console.error('Error al obtener los roles del usuario:', error);

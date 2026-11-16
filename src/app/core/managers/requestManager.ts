@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { HttpErrorManager } from './errorManager';
 
 import { environment } from '../../../environments/environment';
@@ -44,8 +44,9 @@ export class RequestManager {
    * @param params (an Key, Value object with que query params for the request)
    * @returns Observable<any>
    */
-  get(endpoint: string) {
-    return this.http.get<any>(`${this.path}${endpoint}`, this.httpOptions).pipe(
+  get<T=any>(endpoint: string) {
+    return this.http.get<T>(`${this.path}${endpoint}`, this.httpOptions).pipe(
+      map((response) => response as T),
       catchError(this.errManager.handleError.bind(this))
     );
   }
