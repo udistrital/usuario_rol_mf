@@ -1,18 +1,14 @@
-import { inject, Injectable } from '@angular/core';
-import { HttpHeaders, HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
-import { environment } from '../../environments/environment.development';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ImplicitAuthenticationService {
-  rolesConsulta = environment.ROLES_CONSULTA;
-  rolesEdicion = environment.ROLES_CONSULTA_EDICION;
   private readonly userSubject = new BehaviorSubject({});
   public user$ = this.userSubject.asObservable();
   httpOptions: { headers: HttpHeaders } | undefined;
-
-  private readonly httpClient = inject(HttpClient);
 
   constructor() {
     this.init();
@@ -60,11 +56,4 @@ export class ImplicitAuthenticationService {
     });
   }
 
-  public PermisoEdicion(roles: string[]): boolean {
-    return roles.some((rol) => this.rolesEdicion.includes(rol));
-  }
-
-  public PermisoConsulta(roles: string[]): boolean {
-    return roles.some((rol) => this.rolesConsulta.includes(rol));
-  }
 }
