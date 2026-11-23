@@ -11,8 +11,8 @@ const SISTEMAS_POR_ROL = [
     {
         SISTEMA: 'ARGO_V2',
         ROLES: {
-            CONSULTA: new Set(['ADMIN_ARGO', 'JEFE_CONTRATACION', 'JEFE_DEPENDENCIA']),
-            EDICION: new Set(['ADMIN_ARGO', 'JEFE_CONTRATACION']),
+            CONSULTA: new Set(['ADMIN_ARGO', 'JEFE_CONTRATACION_RECTOR', 'JEFE_CONTRATACION_IDEXUD']),
+            EDICION: new Set(['ADMIN_ARGO', 'JEFE_CONTRATACION_RECTOR', 'JEFE_CONTRATACION_IDEXUD']),
         },
     },
 ];
