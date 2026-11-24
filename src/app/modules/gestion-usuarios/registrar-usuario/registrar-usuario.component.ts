@@ -6,6 +6,10 @@ import { HistoricoUsuariosMidService } from 'src/app/services/historico-usuarios
 import { TercerosService } from 'src/app/services/terceros.service';
 import { ModalService } from 'src/app/services/modal.service';
 import { esFechaFinValida } from 'src/app/shared/utils/fecha';
+import { ParametrosService } from 'src/app/services/parametros.service';
+import { environment } from 'src/environments/environment';
+import { sistemaPorRol } from 'src/app/shared/utils/sistemaPorRol';
+import { ImplicitAuthenticationService } from 'src/app/services/implicit-authentication.service';
 
 export interface RolRegistro {
   Nombre: string;
@@ -25,6 +29,7 @@ export class RegistrarUsuarioComponent {
   @ViewChild('emailInput') emailInput!: ElementRef;
 
   roles: RolRegistro[] = [];
+  sistemaInformacion: number = 0;
   nombreCompleto: string = '';
   identificacion: string = '';
   fechaInicioValue!: Date;
@@ -36,10 +41,13 @@ export class RegistrarUsuarioComponent {
   private readonly autenticacionService = inject(AutenticacionService);
   private readonly modalService = inject(ModalService);
   private readonly router = inject(Router);
+  private readonly parametrosService = inject(ParametrosService);
+  private readonly authService = inject(ImplicitAuthenticationService);
   
   constructor() {}
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    await this.definirSistema();
     this.obtenerRoles();
   }
 
@@ -52,8 +60,14 @@ export class RegistrarUsuarioComponent {
     this.fechaFinValue = null!;
   }
 
+  async definirSistema() {
+    const roles = await this.authService.getRole();
+    const tiposSistema = await this.parametrosService.get(`parametro?query=TipoParametroId.Id:${environment.TIPO_PARAMETRO_SISTEMA_ID}`);
+    this.sistemaInformacion = sistemaPorRol(roles, tiposSistema);
+  }
+
   obtenerRoles(): void {
-    this.historico_service.get('roles').subscribe({
+    this.historico_service.get(`roles?query=SistemaInformacionId:${this.sistemaInformacion}`).subscribe({
       next: (response: any) => {
         if (response && Array.isArray(response.Data)) {
           this.roles = response.Data;
@@ -134,7 +148,9 @@ export class RegistrarUsuarioComponent {
     nombreRol: string,
     email: string
   ) {
-    this.historico_service.get(`usuarios/${documento}/periodos`).subscribe({
+    this.historico_service.get(
+      `usuarios/${documento}/periodos?query=sistema_informacion:${this.sistemaInformacion}`
+    ).subscribe({
       next: (response: any) => {
         const periodos = response?.Data || [];
 
