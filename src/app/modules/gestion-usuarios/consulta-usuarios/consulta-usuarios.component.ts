@@ -23,6 +23,8 @@ import { catchError, map, of, forkJoin, switchMap, Observable } from 'rxjs';
 import moment from 'moment';
 import 'moment/moment.js';
 import * as XLSX from 'xlsx-js-style';
+import { PermisoConsulta, PermisoEdicion, sistemaPorRol } from 'src/app/shared/utils/sistemaPorRol';
+import { ParametrosService } from 'src/app/services/parametros.service';
 
 interface UserData {
   nombre: string;
@@ -83,15 +85,19 @@ export class UsuariosComponent implements OnInit {
   private readonly changeDetector = inject(ChangeDetectorRef);
   private readonly authService = inject(ImplicitAuthenticationService);
   private readonly modalService = inject(ModalService);
+  private readonly parametrosService = inject(ParametrosService);
   
   constructor( ) {}
 
   ngOnInit() {
     this.authService
       .getRole()
-      .then((roles) => {
-        this.permisoEdicion.set(this.authService.PermisoEdicion(roles));
-        this.permisoConsulta = this.authService.PermisoConsulta(roles);
+      .then(async (roles) => {
+        const tiposSistema = await this.parametrosService.get(`parametro?query=TipoParametroId.Id:${environment.TIPO_PARAMETRO_SISTEMA_ID}`);
+        this.sistemaInformacion = sistemaPorRol(roles, tiposSistema);
+        this.permisoEdicion.set(PermisoEdicion(roles, this.sistemaInformacion, tiposSistema));
+        this.permisoConsulta = PermisoConsulta(roles, this.sistemaInformacion, tiposSistema);
+        this.PeriodosUsuario(this.sistemaInformacion, this.opcionesPagina[0], 0);
         if (!this.permisoEdicion()) {
           this.displayedColumns = this.displayedColumns.filter(
             (col) => col !== 'acciones'
@@ -107,8 +113,6 @@ export class UsuariosComponent implements OnInit {
     //  fecha_inicio: ['', [Validators.required]]
     });
 
-    this.sistemaInformacion = environment.SISTEMA_INFORMACION_ID;
-    this.PeriodosUsuario(this.sistemaInformacion, this.opcionesPagina[0], 0);
   }
 
   ngAfterViewInit() {
